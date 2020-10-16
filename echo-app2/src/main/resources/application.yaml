@@ -1,0 +1,12 @@
+resteasy:
+  jaxrs:
+    app:
+      registration: property
+      classes: com.sample.app.JaxrsApplication
+server:
+  port: 8443
+  http2:
+    enabled: false
+  ssl:
+    key-store: classpath:selfsigned.jks
+    key-store-password: changeme

@@ -1,0 +1,12 @@
+resteasy:
+  jaxrs:
+    app:
+      registration: property
+      classes: com.sample.app.JaxrsApplication
+server:
+
+  ssl:
+    trust-store: classpath:foo.jks
+    trust-store-password: changeme
+    key-store: classpath:selfsigned.jks
+    key-store-password: changeme
