@@ -19,9 +19,6 @@ import javax.ws.rs.core.MediaType;
 @Component
 public class Echo {
 
-    @Autowired
-    private EchoMessageCreator echoer;
-
     /**
      * Receives a simple POST request message containing as payload
      * a text, in text plain format, to be echoed by the service.

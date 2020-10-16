@@ -15,6 +15,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.Arrays;
 
 /**
  * Echo REST endpoint class
@@ -25,14 +26,23 @@ import javax.ws.rs.core.MediaType;
 @Component
 public class Echo {
 
-    @Autowired
-    private EchoMessageCreator echoer;
+    final String[] SUPPORTED_PROTOCOLS = new String[]{"TLSv1.3", "TLSv1.2", "TLSv1.1", "TLSv1"};
 
+    final String[] TLSV13_CIPHER_SUITES = { "TLS_AES_128_GCM_SHA256", "TLS_AES_256_GCM_SHA384" };
 
+    SslContextBuilder sslContextBuilder = SslContextBuilder.forClient().
+            trustManager(InsecureTrustManagerFactory.INSTANCE).
+            protocols(SUPPORTED_PROTOCOLS)
+            .ciphers(Arrays.asList(TLSV13_CIPHER_SUITES));
+    HttpClient client =
+            HttpClient.create()
+                    .wiretap(true)
+                    .protocol(HttpProtocol.H2, HttpProtocol.HTTP11)
+                    .headers(h -> h.set("Content-Type", "text/plain"))
+                    .headers(h -> h.set("Accept", "text/plain"))
+                    .secure(spec -> spec.sslContext(sslContextBuilder));
 
-    public Echo() throws Exception {
-        //File keystore = new File(ClassLoader.getSystemClassLoader().getResource("/selfsigned.jkd").getFile());
-        //InputStream keystore = Echo.class.getResourceAsStream("foo.jks");
+    public Echo() {
     }
     /**
      * Receives a simple POST request message containing as payload
@@ -47,12 +57,7 @@ public class Echo {
     @Consumes({ MediaType.TEXT_PLAIN })
     @Produces({ MediaType.TEXT_PLAIN })
     public String echo(@NotEmpty String echoText) {
-        SslContextBuilder sslContextBuilder = SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE);
-        HttpClient client =
-                HttpClient.create()
-                        .protocol(HttpProtocol.HTTP11)
-                        .headers(h -> h.set("Accept", "text/plain"))
-                        .secure(spec -> spec.sslContext(sslContextBuilder));
+
         String response = client.post()
                 .uri("https://localhost:8443/sample-app/echo")
                 .send(ByteBufFlux.fromString(Mono.just(echoText)))
