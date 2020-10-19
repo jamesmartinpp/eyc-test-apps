@@ -2,15 +2,20 @@
 
 ## Run the test applications
 ```text
-> cd echo-app2
-> mvn spring-boot:run
+> cd echo-app2 
+> mvn spring-boot:run -s ../settings.xml
 
 > cd echo-app1
-> mvn spring-boot:run
+> mvn spring-boot:run -s ../settings.xml
 
 >  curl -k -X POST -d "this is a simple test whatever, whatever" -H 'Content-Type: text/plain' https://localhost:8443/sample-app/echo
 ```
-
+As an alternative to running the upstream echo-app1 you can run the unit test that does more or less the same thing 
+as the app.
+```text
+> cd echo-app1
+> mvn test -s ../settings.xml
+```
 ## Collecting the tcpdump data
 While your services are running start the tcpdump program and attach to the downstream application.ssl.port:
 ```text
